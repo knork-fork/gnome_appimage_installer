@@ -1,4 +1,5 @@
 # gnome_appimage_installer
+Create a desktop application file that follows the freedesktop.org spec for your .AppImage files.
 
 Install:
 
