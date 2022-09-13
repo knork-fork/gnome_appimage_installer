@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+
+
+app_name=${1:-} # app name
+dl_url=${2:-}   # url to YourApp.AppImage
+icon_url=${3:-} # url to image.png
+
+err=false
+if [[ -z "$app_name" ]]; then
+	echo "missing app name"
+    err=true
+fi
+if [[ -z "$dl_url" ]]; then
+	echo "missing download url"
+    err=true
+fi
+if [[ -z "$icon_url" ]]; then
+	echo "missing icon url"
+    err=true
+fi
+if [[ "$err" = true ]]; then
+    echo "usage: gnome_appimage_installer <app name> <download url> <icon url>"
+    exit 1
+fi
+
+lowercase_app_name=${app_name,,}
+
+curl --location --output $app_name.AppImage "$dl_url"
+curl --location --output $lowercase_app_name.png "$icon_url"
+
+sudo mkdir --parents /opt/$lowercase_app_name/
+sudo mv $app_name.AppImage /opt/$lowercase_app_name
+sudo chmod u+x /opt/$lowercase_app_name/$app_name.AppImage
+sudo mv $lowercase_app_name.png /opt/$lowercase_app_name
+sudo ln -s /opt/$lowercase_app_name/$lowercase_app_name.png /usr/share/pixmaps
+
+echo "[Desktop Entry]
+Type=Application
+Name=$app_name
+Exec=/opt/$lowercase_app_name/$app_name.AppImage
+Icon=$lowercase_app_name
+Terminal=false" > ~/.local/share/applications/$lowercase_app_name.desktop
+
+update-desktop-database ~/.local/share/applications
+echo "install ok"
+

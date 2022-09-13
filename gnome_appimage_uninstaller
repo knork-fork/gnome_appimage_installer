@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+app_name=${1:-} # app name
+
+if [[ -z "$app_name" ]]; then
+	echo "missing app name"
+    echo "usage: gnome_appimage_uninstaller <app name>"
+    exit 1
+fi
+
+lowercase_app_name=${app_name,,}
+
+sudo rm -rf /opt/$lowercase_app_name
+sudo rm /usr/share/pixmaps/$lowercase_app_name.png
+sudo rm ~/.local/share/applications/$lowercase_app_name.desktop
+
+echo "uninstall ok"
+
